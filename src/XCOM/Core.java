@@ -7,13 +7,13 @@ package XCOM;
  * Tabletop X-COM Assistance Tool
  */
 public class Core {
-
+	//Debugging flag
+	public static final boolean DEBUG = false;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		new frmMain();
 	}
 
 }
