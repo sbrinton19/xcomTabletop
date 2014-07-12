@@ -3,9 +3,11 @@ package XCOM;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,11 +23,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 /**
- * @author Stefan frmMain is the UI housing all functional components for the
- *         application
+ * @author Stefan ScanGUI is the UI housing the scanning actions
+ * and the home GUI for the application
  */
-public class frmMain extends FormTemplate implements ActionListener,
-		MouseListener {
+public class ScanGUI extends GUITemplate implements MouseListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,21 +45,18 @@ public class frmMain extends FormTemplate implements ActionListener,
 	private int lastAlien = 0;
 	private int lastExalt = 0;
 	
-	public frmMain() {
+	public ScanGUI() {
+		//Initialize Calendar
 		currentDate = Calendar.getInstance();
 		currentDate.setTimeInMillis(0);
-		System.out.println(currentDate.toString());
+
+		//Set up menu and Frame options
 		addMouseListener(this);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("X-Com Admin Tool");
-		load.addActionListener(this);
-		save.addActionListener(this);
-		exit.addActionListener(this);
 		main.setEnabled(false);
-		maps.addActionListener(this);
-		playerAdmin.addActionListener(this);
-		xcomAdmin.addActionListener(this);
-
+		
+		//Setup contents
 		scan = new JButton("Scan for Activity");
 		scan.addActionListener(this);
 		dayPop = new JPopupMenu();
@@ -78,6 +76,7 @@ public class frmMain extends FormTemplate implements ActionListener,
 		exaltEntry.addActionListener(this);
 		exaltEntry.setVisible(false);
 
+		//Setup Layout
 		GridBagConstraints c = new GridBagConstraints();
 
 		
@@ -117,7 +116,7 @@ public class frmMain extends FormTemplate implements ActionListener,
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void subActionPerformed(ActionEvent arg0) {
 		if(arg0.getSource() == scan && !alienEntry.isVisible() && !exaltEntry.isVisible()){
 			//Scan was clicked, advance day by 1 
 			//and calculate chance for alien attack
@@ -198,7 +197,7 @@ public class frmMain extends FormTemplate implements ActionListener,
 			//Calculate EXALT and Display
 			int exaltProb;
 			/*
-			 * To formulae are used in this case
+			 * To formulae are used in these cases
 			 * Immediately following an attack a formula that renders an immediate attack impossible
 			 * And very slim chance of an attack a day after
 			 * 
@@ -211,6 +210,8 @@ public class frmMain extends FormTemplate implements ActionListener,
 			exalt.setText("EXALT Roll: " + exaltProb);
 			exaltEntry.setVisible(true);
 			exaltEntry.requestFocus();
+			save.setEnabled(false);
+			load.setEnabled(false);
 			pack();
 		}
 		else if(arg0.getSource() == exaltEntry){
@@ -239,9 +240,11 @@ public class frmMain extends FormTemplate implements ActionListener,
 			exaltEntry.setVisible(false);
 			exaltEntry.setText("       ");
 			scan.requestFocus();
+			save.setEnabled(true);
+			load.setEnabled(true);
 		}
 		else if(arg0.getSource() == setDay){
-			//Manually Set the date for scanning: Also allows manual timeskips if your campaign calls for it
+			//Manually Set the date for scanning: Also allows manual time skips if your campaign calls for it
 			int curYear = -1;
 			while(curYear < 2001){
 				String year = (String) JOptionPane.showInputDialog(this, "Enter a valid year", "Year Entry", JOptionPane.PLAIN_MESSAGE, null, null, 2015);
@@ -290,6 +293,7 @@ public class frmMain extends FormTemplate implements ActionListener,
 			setDate();
 			pack();
 		}
+		
 	}
 
 	/**
@@ -337,4 +341,25 @@ public class frmMain extends FormTemplate implements ActionListener,
 
 	}
 
+	@Override
+	protected void save(ObjectOutputStream out) throws IOException {
+		out.writeInt(AACount);
+		out.writeInt(lastAlien);
+		out.writeInt(XACount);
+		out.writeInt(lastExalt);
+		out.writeLong(currentDate.getTimeInMillis());
+	}
+
+	@Override
+	protected void load(ObjectInputStream in) throws IOException
+	{
+		AACount = in.readInt();
+		lastAlien = in.readInt();
+		XACount = in.readInt();
+		lastExalt = in.readInt();
+		currentDate.setTimeInMillis(in.readLong());
+		setDate();
+		pack();
+	}
+	
 }
