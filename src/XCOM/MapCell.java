@@ -26,6 +26,7 @@ public class MapCell extends JPanel{
 	//dd is the cover for the right
 	
 	public byte cover;
+	public byte contents;
 	public boolean selected;
 	private final int HEIGHT = 51, WIDTH = 51;
 	/**
@@ -39,6 +40,7 @@ public class MapCell extends JPanel{
 	public MapCell(int x, int y){
 		selected = false;
 		cover = 0;
+		contents = 0;
 		//This Doesn't matter because it will ALWAYS be inside a scrollpane
 		//So this method doesn't hurt portability
 		setPreferredSize(new Dimension(HEIGHT,WIDTH));
@@ -66,13 +68,20 @@ public class MapCell extends JPanel{
 		g.drawLine(WIDTH-2, 0, WIDTH-2, HEIGHT-1);
 		setColor(g, bottom);
 		g.drawLine(3, HEIGHT-2, WIDTH-1, HEIGHT-2);
-		
-		if(selected){
-			g.setStroke(new BasicStroke(1));
-			g.setColor(Color.cyan);
-			g.fillRect(3, 3, HEIGHT-6, WIDTH-6);
-		}
+		Color color = Color.LIGHT_GRAY;
+		if(selected)
+			color = Color.cyan;
+		else if(contents == 1)
+			color = Color.black;
+		else if(contents == 2)
+			color = Color.red;
+		else if (contents == 3)
+			color = Color.blue;
+		g.setStroke(new BasicStroke(1));
+		g.setColor(color);
+		g.fillRect(3, 3, HEIGHT-6, WIDTH-6);
 	}
+		
 	public void setColor(Graphics g, byte cover){
 		//No Cover
 		if(cover == 0)
@@ -112,4 +121,9 @@ public class MapCell extends JPanel{
 		repaint();
 	}
 
+	public void setContent(byte content){
+		this.contents = content;
+		repaint();
+	}
+	
 }

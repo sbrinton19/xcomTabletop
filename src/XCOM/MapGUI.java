@@ -47,11 +47,12 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	private JLabel bottom;
 	private JLabel left;
 	private JLabel right;
+	private JLabel content;
 	private JComboBox<String> topCell;
 	private JComboBox<String> bottomCell;
 	private JComboBox<String> leftCell;
 	private JComboBox<String> rightCell;
-	
+	private JComboBox<String> contentCell;
 	
 	private MapCell editCell;
 	
@@ -104,6 +105,15 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		rightCell.addActionListener(this);
 		rightCell.setToolTipText("Sets the cover on a tile's right");
 		right = new JLabel("Set Cover for the Right of selected tile");
+		
+		/*
+		 * Destructible cover cannot be entered until it is destroyed 
+		 */
+		String[] contents = { "Empty", "Not Enterable", "Destructible cover", "Aireal Units only" };
+		contentCell = new JComboBox<String>(contents);
+		contentCell.addActionListener(this);
+		contentCell.setToolTipText("Sets the contents of the selected tile");
+		content = new JLabel("Set Content for the selected tile");
 		
 		//MAPVIEW
 		mapContainer = new ScrollPanel(new GridLayout(rowCount, columnCount));
@@ -238,6 +248,10 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setRight(cover);
 		}
+		else if(arg0.getSource() == contentCell){
+			byte content = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
+			editCell.setContent(content);
+		}
 	}
 
 	@Override
@@ -255,6 +269,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			bottomCell.setSelectedIndex((editCell.cover & 0x30) >>> 4);
 			leftCell.setSelectedIndex((editCell.cover & 0x0C) >>> 2);
 			rightCell.setSelectedIndex(editCell.cover & 0x03);
+			contentCell.setSelectedIndex(editCell.contents);
 			if(!sidebar.isAncestorOf(top)){
 				GridBagConstraints c = new GridBagConstraints();
 				c.weightx = 1;
@@ -275,6 +290,10 @@ public class MapGUI extends GUITemplate implements MouseListener {
 				sidebar.add(rightCell,c);
 				c.gridx = 0;
 				sidebar.add(right,c);
+				c.gridy = 8;
+				sidebar.add(content, c);
+				c.gridx = 1;
+				sidebar.add(contentCell,c);
 				sidebar.revalidate();
 			}
 		}
