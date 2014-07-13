@@ -1,5 +1,7 @@
 package XCOM;
 
+import java.util.Vector;
+
 /**
  * Core serves as the implementation class
  * The class initializes the ScanGUI to start the application and implements
@@ -10,13 +12,16 @@ package XCOM;
  */
 public class Core {
 	
+	public static Vector<GUITemplate> guis;  
+	
 	//Debugging flag
 	public static final boolean DEBUG = false;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new ScanGUI();
+		guis = new Vector<GUITemplate>();
+		guis.add(new ScanGUI());
 	}
 
 	/*
@@ -30,7 +35,23 @@ public class Core {
 	 * Initializes a new MapGUI
 	 */
 	public static void makeMap(){
-		new MapGUI();
+		for(GUITemplate temp: guis ){
+			if(temp instanceof MapGUI){
+				temp.toFront();
+				return;
+			}
+		}
+		guis.add(new MapGUI());
+	}
+
+	public static void makeScan() {
+		for(GUITemplate temp: guis ){
+			if(temp instanceof ScanGUI){
+				temp.toFront();
+				return;
+			}
+		}
+		guis.add(new ScanGUI());
 	}
 	
 }

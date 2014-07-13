@@ -67,7 +67,8 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	
 	private MapCell editCell;
 	private int currentElevation = 0;
-	
+	//Tracks changes for save on close
+	private boolean changes = false;
 	public MapGUI(){
 		//Setup GUI defaults
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -237,10 +238,18 @@ public class MapGUI extends GUITemplate implements MouseListener {
 					byte[] writing = {mapGraphics.get(i).get(j).get(k).cover,mapGraphics.get(i).get(j).get(k).contents};
 					out.write(writing);
 				}
+		changes = false;
 	}
 
 	@Override
 	protected void load(ObjectInputStream in) throws IOException {
+		if(changes){
+			int ret = JOptionPane.showConfirmDialog(this, "Do you want to save the changes to this item before loading?");
+			if(ret == 2)
+				return;
+			if(ret == 0)
+				saveDialog();
+		}
 		rowCount = in.readInt();
 		columnCount = in.readInt();
 		elevationCount = in.readInt();
@@ -269,7 +278,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		
 		mapContainer.revalidate();
 		mapContainer.repaint();
-		
+		changes = false;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -294,6 +303,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			mapGraphics.add(temp);
 			mapContainer.revalidate();
 			rowCount++;
+			changes =true;
 		}
 		else if(arg0.getSource() == removeRow && rowCount > 1){
 			//Removing a row requires the graphics to be updated prior to the reference to the graphic elements' removal
@@ -308,6 +318,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			mapGraphics.remove(rowCount);
 			
 			mapContainer.revalidate();
+			changes =true;
 		}
 		else if(arg0.getSource() == addColumn){
 			//Adding a column requires that the GridLayout be extended and the graphics and references are updated
@@ -329,6 +340,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			}
 			mapContainer.revalidate();
 			columnCount++;
+			changes =true;
 		}
 		else if(arg0.getSource() == removeColumn && columnCount > 1){
 			//Removing a column requires the graphics to be updated prior to the reference to the graphic elements' removal
@@ -343,6 +355,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 				mapGraphics.get(i).remove(columnCount);
 			}
 			mapContainer.revalidate();
+			changes = true;
 		}
 		else if(arg0.getSource() == addElevation){
 			for(int i = 0; i< mapGraphics.size(); i++)
@@ -352,6 +365,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 					mapGraphics.get(i).get(j).add(adder);
 				}
 			elevationCount++;
+			changes = true;
 		}
 		else if(arg0.getSource() == removeElevation && elevationCount > 1){
 			//Removing a column requires the graphics to be updated prior to the reference to the graphic elements' removal
@@ -370,6 +384,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 				}
 			mapContainer.revalidate();
 			mapContainer.repaint();
+			changes = true;
 		}
 		else if(arg0.getSource() == upElevation && currentElevation < elevationCount -1){
 			mapContainer.removeAll();
@@ -398,22 +413,27 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		else if(arg0.getSource() == topCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setTop(cover);
+			changes = true;
 		}
 		else if(arg0.getSource() == bottomCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setBottom(cover);
+			changes = true;
 		}
 		else if(arg0.getSource() == leftCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setLeft(cover);
+			changes = true;
 		}
 		else if(arg0.getSource() == rightCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setRight(cover);
+			changes = true;
 		}
 		else if(arg0.getSource() == contentCell && editCell != null){
 			byte content = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setContent(content);
+			changes = true;
 		}
 	}
 
@@ -428,11 +448,15 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			editCell = (MapCell) arg0.getSource();
 			editCell.selected = true;
 			editCell.repaint();
+			boolean temp = changes;
+					
 			topCell.setSelectedIndex((editCell.cover & 0xC0) >>> 6);
 			bottomCell.setSelectedIndex((editCell.cover & 0x30) >>> 4);
 			leftCell.setSelectedIndex((editCell.cover & 0x0C) >>> 2);
 			rightCell.setSelectedIndex(editCell.cover & 0x03);
 			contentCell.setSelectedIndex(editCell.contents);
+			changes = temp; //The setSelected Invoke actionListeners that changes to true despite nothing actually happening
+			//So we have to reload its old value
 		}
 	}
 
@@ -466,8 +490,27 @@ public class MapGUI extends GUITemplate implements MouseListener {
 
 	@Override
 	protected FileFilter getFilter() {
-		// TODO Auto-generated method stub
 		return new FileNameExtensionFilter("XCOM Map", "xmap");
+	}
+
+	@Override
+	public void dispose() {
+		if(!changes){
+			Core.guis.remove(this);
+			super.dispose();
+			return;
+		}
+		int ret = JOptionPane.showConfirmDialog(this, "Do you want to save the changes to this item?");
+		if(ret == 1){
+			Core.guis.remove(this);
+			super.dispose();
+			return;
+		}
+		if(ret == 2)
+			return;
+		saveDialog();
+		Core.guis.remove(this);
+		super.dispose();
 	}
 
 }

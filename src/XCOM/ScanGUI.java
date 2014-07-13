@@ -33,7 +33,7 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private JButton scan;
+	private JButton scanning;
 	private JLabel fullDate;
 	private JLabel day;
 	private JLabel alien;
@@ -47,7 +47,8 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 	private int XACount = 0;
 	private int lastAlien = 0;
 	private int lastExalt = 0;
-	
+	//This indicates if the file has been changed since last save or load
+	private boolean changes= false;
 	public ScanGUI() {
 		//Initialize Calendar
 		currentDate = Calendar.getInstance();
@@ -57,11 +58,11 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 		addMouseListener(this);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("X-Com Admin Tool");
-		main.setEnabled(false);
+		scan.setEnabled(false);
 		
 		//Setup contents
-		scan = new JButton("Scan for Activity");
-		scan.addActionListener(this);
+		scanning = new JButton("Scan for Activity");
+		scanning.addActionListener(this);
 		dayPop = new JPopupMenu();
 		setDay = new JMenuItem("Set Day");
 		setDay.addActionListener(this);
@@ -112,7 +113,7 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 		c.gridheight = 2;
 		c.gridwidth = 2;
 		c.fill = GridBagConstraints.BOTH;
-		add(scan, c);
+		add(scanning, c);
 
 		setVisible(true);
 		pack();
@@ -120,7 +121,7 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 
 	@Override
 	public void subActionPerformed(ActionEvent arg0) {
-		if(arg0.getSource() == scan && !alienEntry.isVisible() && !exaltEntry.isVisible()){
+		if(arg0.getSource() == scanning && !alienEntry.isVisible() && !exaltEntry.isVisible()){
 			//Scan was clicked, advance day by 1 
 			//and calculate chance for alien attack
 			//(EXALT attack is calculated after alien attack is checked)
@@ -242,7 +243,7 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 			exalt.setText("EXALT Roll: ");
 			exaltEntry.setVisible(false);
 			exaltEntry.setText("       ");
-			scan.requestFocus();
+			scanning.requestFocus();
 			save.setEnabled(true);
 			load.setEnabled(true);
 		}
@@ -306,6 +307,8 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 	 * it should be called after any changes to it
 	 */
 	private void setDate(){
+		//Saving is disabled between scans so all changes will be caught
+		changes = true;
 		if(currentDate.getTimeInMillis() == 0){
 			fullDate.setText("");
 			day.setText("Day: --");
@@ -356,6 +359,7 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 		out.writeInt(XACount);
 		out.writeInt(lastExalt);
 		out.writeLong(currentDate.getTimeInMillis());
+		changes = false;
 	}
 
 	@Override
@@ -368,6 +372,7 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 		currentDate.setTimeInMillis(in.readLong());
 		setDate();
 		pack();
+		changes = false;
 	}
 
 	@Override
@@ -378,6 +383,26 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 	@Override
 	protected FileFilter getFilter() {
 		return new FileNameExtensionFilter("XCOM Date", "xdate");
+	}
+
+	@Override
+	public void dispose() {
+		if(!changes){
+			Core.guis.remove(this);
+			super.dispose();
+			return;
+		}
+		int ret = JOptionPane.showConfirmDialog(this, "Do you want to save the changes to this item?");
+		if(ret == 1){
+			Core.guis.remove(this);
+			super.dispose();
+			return;
+		}
+		if(ret == 2)
+			return;
+		saveDialog();
+		Core.guis.remove(this);
+		super.dispose();
 	}
 	
 }

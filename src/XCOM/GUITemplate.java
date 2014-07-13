@@ -38,7 +38,7 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 	protected JMenuItem exit;
 
 	protected JMenu views;
-	protected JMenuItem main;
+	protected JMenuItem scan;
 	protected JMenuItem maps;
 	protected JMenuItem playerAdmin;
 	protected JMenuItem xcomAdmin;
@@ -65,9 +65,9 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 		
 		
 		//View Menu
-		main = new JMenuItem("Main");
-		main.setToolTipText("Open Main");
-		main.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.ALT_MASK));
+		scan = new JMenuItem("Scan");
+		scan.setToolTipText("Open Scanning GUI");
+		scan.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.ALT_MASK));
 		maps = new JMenuItem("Maps");
 		maps.setToolTipText("Open Map Editor/Use Window");
 		maps.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M,ActionEvent.ALT_MASK));
@@ -79,11 +79,11 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 		xcomAdmin.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,ActionEvent.ALT_MASK));
 		views = new JMenu("Views");
 		views.setMnemonic('V');
-		views.add(main);
+		views.add(scan);
 		views.add(maps);
 		views.add(playerAdmin);
 		views.add(xcomAdmin);
-		main.addActionListener(this);
+		scan.addActionListener(this);
 		maps.addActionListener(this);
 		playerAdmin.addActionListener(this);
 		xcomAdmin.addActionListener(this);
@@ -215,12 +215,15 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 		else if(arg0.getSource() == maps){
 			Core.makeMap();
 		}
+		else if(arg0.getSource() == scan){
+			Core.makeScan();
+		}
 		else{
-			subActionPerformed(arg0);
+ 			subActionPerformed(arg0);
 		}
 		
 	}
-	
+		
 	/**
 	 * Abstract method used to allow subclasses to define what information is saved to file
 	 * @param out
@@ -261,4 +264,6 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 	 * file extension
 	 */
 	abstract protected FileFilter getFilter();
+	
+	
 }
