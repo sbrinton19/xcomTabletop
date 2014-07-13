@@ -19,6 +19,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * Serves as a general template of GUIs throughout the project
@@ -42,6 +43,8 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 	protected JMenuItem playerAdmin;
 	protected JMenuItem xcomAdmin;
 	protected final JFileChooser fileChooser = new JFileChooser();
+	protected String fileExt = "";
+	
 	
 	protected GUITemplate(){
 		//File Menu
@@ -91,6 +94,8 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 		setJMenuBar(bar);
 		
 		setLayout(new GridBagLayout());
+		
+		fileChooser.setFileFilter(getFilter());
 	}
 	
 	
@@ -102,6 +107,9 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 		int ret = fileChooser.showSaveDialog(this);
 		if(ret == JFileChooser.APPROVE_OPTION){
 			File file = fileChooser.getSelectedFile();
+			if(!file.getPath().toLowerCase().endsWith(getExtension())){
+				file = new File(file.getPath()+ getExtension());
+			}
 			if(!file.exists())
 				try {
 					file.createNewFile();
@@ -238,4 +246,19 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 	 */
 	abstract protected void subActionPerformed(ActionEvent arg0);
 	
+	/**
+	 * This method is an abstract overrideable for 
+	 * forms to indicate what extension they save as
+	 * @return
+	 * The file extension type this form saves
+	 */
+	abstract protected String getExtension();
+	/**
+	 * This method is an abstract overrideable for 
+	 * forms to indicate what extension they load
+	 * @return
+	 * A filter to let this form only load the correct
+	 * file extension
+	 */
+	abstract protected FileFilter getFilter();
 }

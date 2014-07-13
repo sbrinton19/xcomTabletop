@@ -1,0 +1,24 @@
+Saving Heuristics Documentation
+
+.xdate:
+	Count of Alien Attacks: int
+	Days since last Alien Attack: int
+	Count of Exalt Attacks: int
+	Days since last Exalt Attack: int
+	Current Date as time in milliseconds: long
+	
+.xmap:
+	Number of rows: int
+	Number of columns: int
+	Number of Layers (Elevation): int
+	Tiles' Data:
+		This data is organized by layer, column, and then row
+		For a 2x2x2 cube the first tile saved is the one at 0,0,0
+		then 0,0,1  
+		then 0,1,0
+		then 0,1,1
+		then 1,0,0
+		then 1,0,1
+		then 1,1,0
+		then 1,1,1
+		Each tile is {1 byte for cover, 1 byte for contents}

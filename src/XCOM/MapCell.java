@@ -77,6 +77,10 @@ public class MapCell extends JPanel{
 			color = Color.red;
 		else if (contents == 3)
 			color = Color.blue;
+		else if (contents == 4)
+			color = Color.YELLOW;
+		else if (contents == 5)
+			color = Color.ORANGE;
 		g.setStroke(new BasicStroke(1));
 		g.setColor(color);
 		g.fillRect(3, 3, HEIGHT-6, WIDTH-6);

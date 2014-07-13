@@ -19,6 +19,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * This GUI is the Map Editor. It will hopefully be augmented with sandbox functionality for simulation and DM aid, eventually...
@@ -130,7 +132,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		/*
 		 * Destructible cover cannot be entered until it is destroyed 
 		 */
-		String[] contents = { "Empty", "Not Enterable", "Destructible cover", "Aireal Units only" };
+		String[] contents = { "Empty", "Not Enterable", "Destructible cover", "Aireal Units only", "Climbable item", "Incline" };
 		contentCell = new JComboBox<String>(contents);
 		contentCell.addActionListener(this);
 		contentCell.setToolTipText("Sets the contents of the selected tile");
@@ -226,13 +228,47 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	
 	@Override
 	protected void save(ObjectOutputStream out) throws IOException {
-		// TODO Auto-generated method stub
-		
+		out.writeInt(rowCount);
+		out.writeInt(columnCount);
+		out.writeInt(elevationCount);
+		for(int i = 0; i < rowCount; i++)
+			for(int j = 0; j < columnCount; j++)
+				for(int k = 0; k < elevationCount; k++){
+					byte[] writing = {mapGraphics.get(i).get(j).get(k).cover,mapGraphics.get(i).get(j).get(k).contents};
+					out.write(writing);
+				}
 	}
 
 	@Override
 	protected void load(ObjectInputStream in) throws IOException {
-		// TODO Auto-generated method stub
+		rowCount = in.readInt();
+		columnCount = in.readInt();
+		elevationCount = in.readInt();
+		currentElevation = 0;
+		labelElevation.setText("Current Elevation: 1");
+		mapContainer.removeAll();
+		mapGraphics.clear();
+		for(int i = 0; i < rowCount; i++){
+			ArrayList<ArrayList<MapCell>> temp = new ArrayList<ArrayList<MapCell>>(); 
+			for(int j = 0; j < columnCount; j++){
+				ArrayList<MapCell> temp2 = new ArrayList<MapCell>();
+				for(int k = 0; k < elevationCount; k++){
+					MapCell adder = new MapCell(0,0);
+					adder.addMouseListener(this);
+					adder.cover = in.readByte();
+					adder.contents = in.readByte();
+					temp2.add(adder);
+					if(k == 0)
+						mapContainer.add(adder);
+				}
+				temp.add(temp2);
+			}
+			mapGraphics.add(temp);
+		}
+		
+		
+		mapContainer.revalidate();
+		mapContainer.repaint();
 		
 	}
 
@@ -421,6 +457,17 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 				
+	}
+
+	@Override
+	protected String getExtension() {
+		return ".xmap";
+	}
+
+	@Override
+	protected FileFilter getFilter() {
+		// TODO Auto-generated method stub
+		return new FileNameExtensionFilter("XCOM Map", "xmap");
 	}
 
 }

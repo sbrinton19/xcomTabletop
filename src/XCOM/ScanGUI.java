@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * ScanGUI is the UI housing the scanning actions
@@ -304,6 +306,11 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 	 * it should be called after any changes to it
 	 */
 	private void setDate(){
+		if(currentDate.getTimeInMillis() == 0){
+			fullDate.setText("");
+			day.setText("Day: --");
+			return;
+		}
 		Date temp = currentDate.getTime();
 		SimpleDateFormat format = new SimpleDateFormat("MMMM d',' yyyy");
 		fullDate.setText("Date: " + format.format(temp));
@@ -361,6 +368,16 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 		currentDate.setTimeInMillis(in.readLong());
 		setDate();
 		pack();
+	}
+
+	@Override
+	protected String getExtension() {
+		return ".xdate";
+	}
+
+	@Override
+	protected FileFilter getFilter() {
+		return new FileNameExtensionFilter("XCOM Date", "xdate");
 	}
 	
 }
