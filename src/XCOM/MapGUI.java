@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -198,6 +199,9 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		}
 		else if(arg0.getSource() == removeRow && rowCount > 1){
 			//Removing a row requires the graphics to be updated prior to the reference to the graphic elements' removal
+			int ret = JOptionPane.showConfirmDialog(this, "Are you sure you want to remove this row?");
+			if(ret != 0)
+				return;
 			GridLayout mapLayout = (GridLayout) mapContainer.getLayout();
 			mapLayout.setRows(mapLayout.getRows()-1);
 			rowCount--;
@@ -223,6 +227,9 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		}
 		else if(arg0.getSource() == removeColumn && columnCount > 1){
 			//Removing a column requires the graphics to be updated prior to the reference to the graphic elements' removal
+			int ret = JOptionPane.showConfirmDialog(this, "Are you sure you want to remove this column?");
+			if(ret != 0)
+				return;
 			GridLayout mapLayout = (GridLayout) mapContainer.getLayout();
 			mapLayout.setColumns(mapLayout.getColumns()-1);
 			columnCount--;
