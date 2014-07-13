@@ -49,6 +49,7 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 	private int lastExalt = 0;
 	//This indicates if the file has been changed since last save or load
 	private boolean changes= false;
+	
 	public ScanGUI() {
 		//Initialize Calendar
 		currentDate = Calendar.getInstance();
@@ -329,28 +330,16 @@ public class ScanGUI extends GUITemplate implements MouseListener {
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseEntered(MouseEvent arg0) {}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseExited(MouseEvent arg0) {}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mousePressed(MouseEvent arg0) {}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseReleased(MouseEvent arg0) {}
 
 	@Override
 	protected void save(ObjectOutputStream out) throws IOException {

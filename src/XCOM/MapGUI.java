@@ -29,9 +29,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class MapGUI extends GUITemplate implements MouseListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -9104342953268029248L;
 
 	private int rowCount = 20;
@@ -226,7 +223,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		setVisible(true);
 		pack();
 	}
-	
+		
 	@Override
 	protected void save(ObjectOutputStream out) throws IOException {
 		out.writeInt(rowCount);
@@ -436,7 +433,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			changes = true;
 		}
 	}
-
+		
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		if(arg0.getSource() instanceof MapCell){
@@ -461,27 +458,16 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseEntered(MouseEvent arg0) {}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseExited(MouseEvent arg0) {}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mousePressed(MouseEvent arg0) {}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-				
-	}
+	public void mouseReleased(MouseEvent arg0) {}
 
 	@Override
 	protected String getExtension() {
