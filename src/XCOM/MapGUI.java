@@ -45,6 +45,10 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	private JButton removeRow;
 	private JButton addColumn;
 	private JButton removeColumn;
+	private JButton addElevation;
+	private JButton removeElevation;
+	private JButton upElevation;
+	private JButton downElevation;
 	
 	private JLabel top;
 	private JLabel bottom;
@@ -56,6 +60,8 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	private JComboBox<String> leftCell;
 	private JComboBox<String> rightCell;
 	private JComboBox<String> contentCell;
+	private JLabel labelElevation;
+	
 	
 	private MapCell editCell;
 	private int currentElevation = 0;
@@ -71,19 +77,31 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		
 		//SIDEBAR
 		sidebar = new JPanel(new GridBagLayout());
-		addRow = new JButton("Add new row to the map");
+		addRow = new JButton("Add Row");
 		addRow.addActionListener(this);
 		addRow.setToolTipText("Adds a new row to the bottom edge of the map");
-		removeRow = new JButton("Remove a row from the map");
+		removeRow = new JButton("Remove Row");
 		removeRow.addActionListener(this);
 		removeRow.setToolTipText("Removes a row from the bottom edge of the map");
-		addColumn = new JButton("Add new column to the map");
+		addColumn = new JButton("Add Column");
 		addColumn.addActionListener(this);
 		addColumn.setToolTipText("Adds a new column to the right edge of the map");
-		removeColumn = new JButton("Remove a column from the map");
+		removeColumn = new JButton("Remove Column");
 		removeColumn.addActionListener(this);
 		removeColumn.setToolTipText("Removes a column from the right edge of the map");
-		
+		addElevation = new JButton("Add Layer");
+		addElevation.addActionListener(this);
+		addElevation.setToolTipText("Adds a new layer of elevation to the top of the map");
+		removeElevation = new JButton("Remove Layer");
+		removeElevation.addActionListener(this);
+		removeElevation.setToolTipText("Removes top layer of elevation from the map");
+		upElevation = new JButton("Edit Up a Layer");
+		upElevation.addActionListener(this);
+		upElevation.setToolTipText("Shifts the view up one layer of elevation");
+		downElevation = new JButton("Edit Down a Layer");
+		downElevation.addActionListener(this);
+		downElevation.setToolTipText("Shifts the view down one layer of elevation");
+		labelElevation = new JLabel("Current Elevation: 1");
 		/*
 		 * Half Cover & Step Up
 		 * indicates that a cover element is a transition up a half unit vertically
@@ -152,6 +170,40 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		sidebar.add(addColumn,c);
 		c.gridy = 3;
 		sidebar.add(removeColumn,c);
+		c.gridy = 4;
+		sidebar.add(addElevation,c);
+		c.gridy = 5;
+		sidebar.add(removeElevation,c);
+		c.gridx = 1;
+		sidebar.add(downElevation,c);
+		c.gridy = 4;
+		sidebar.add(upElevation, c);
+		c.gridy = 3;
+		sidebar.add(labelElevation,c);
+		c.weightx = 1;
+		c.weighty = .2;
+		c.gridy = 6;
+		c.gridx = 0;
+		sidebar.add(top,c);
+		c.gridx = 1;
+		sidebar.add(topCell,c);
+		c.gridy= 7;
+		sidebar.add(bottomCell,c);
+		c.gridx = 0;
+		sidebar.add(bottom,c);
+		c.gridy = 8;
+		sidebar.add(left,c);
+		c.gridx = 1;
+		sidebar.add(leftCell,c);
+		c.gridy= 9;
+		sidebar.add(rightCell,c);
+		c.gridx = 0;
+		sidebar.add(right,c);
+		c.gridy = 10;
+		sidebar.add(content, c);
+		c.gridx = 1;
+		sidebar.add(contentCell,c);
+		
 		
 		c.gridx = 0;
 		c.gridy = 0;
@@ -256,23 +308,74 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			}
 			mapContainer.revalidate();
 		}
-		else if(arg0.getSource() == topCell){
+		else if(arg0.getSource() == addElevation){
+			for(int i = 0; i< mapGraphics.size(); i++)
+				for(int j = 0; j < mapGraphics.get(i).size();j++){
+					MapCell adder = new MapCell(0,0);
+					adder.addMouseListener(this);
+					mapGraphics.get(i).get(j).add(adder);
+				}
+			elevationCount++;
+		}
+		else if(arg0.getSource() == removeElevation && elevationCount > 1){
+			//Removing a column requires the graphics to be updated prior to the reference to the graphic elements' removal
+			int ret = JOptionPane.showConfirmDialog(this, "Are you sure you want to remove this elevation?");
+			if(ret != 0)
+				return;
+			if(--elevationCount == currentElevation){
+				labelElevation.setText("Current Elevation: " + currentElevation--);
+				mapContainer.removeAll();
+			}
+			for(int i = 0; i< mapGraphics.size(); i++)
+				for(int j = 0; j < mapGraphics.get(i).size();j++){
+					mapGraphics.get(i).get(j).remove(elevationCount);
+					if(currentElevation == elevationCount-1)
+						mapContainer.add(mapGraphics.get(i).get(j).get(currentElevation));
+				}
+			mapContainer.revalidate();
+			mapContainer.repaint();
+		}
+		else if(arg0.getSource() == upElevation && currentElevation < elevationCount -1){
+			mapContainer.removeAll();
+			labelElevation.setText("Current Elevation: " + (++currentElevation + 1));
+			for(int i = 0; i< mapGraphics.size(); i++)
+				for(int j = 0; j < mapGraphics.get(i).size();j++)
+					mapContainer.add(mapGraphics.get(i).get(j).get(currentElevation));
+			if(editCell != null)
+				editCell.selected = false;
+			editCell = null;
+			mapContainer.revalidate();
+			mapContainer.repaint();
+		}
+		else if(arg0.getSource() == downElevation && currentElevation > 0){
+			mapContainer.removeAll();
+			labelElevation.setText("Current Elevation: " + currentElevation--);
+			for(int i = 0; i< mapGraphics.size(); i++)
+				for(int j = 0; j < mapGraphics.get(i).size();j++)
+					mapContainer.add(mapGraphics.get(i).get(j).get(currentElevation));
+			if(editCell != null)
+				editCell.selected = false;
+			editCell = null;
+			mapContainer.revalidate();
+			mapContainer.repaint();
+		}
+		else if(arg0.getSource() == topCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setTop(cover);
 		}
-		else if(arg0.getSource() == bottomCell){
+		else if(arg0.getSource() == bottomCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setBottom(cover);
 		}
-		else if(arg0.getSource() == leftCell){
+		else if(arg0.getSource() == leftCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setLeft(cover);
 		}
-		else if(arg0.getSource() == rightCell){
+		else if(arg0.getSource() == rightCell && editCell != null){
 			byte cover = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setRight(cover);
 		}
-		else if(arg0.getSource() == contentCell){
+		else if(arg0.getSource() == contentCell && editCell != null){
 			byte content = (byte) ((JComboBox)arg0.getSource()).getSelectedIndex();
 			editCell.setContent(content);
 		}
@@ -294,32 +397,6 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			leftCell.setSelectedIndex((editCell.cover & 0x0C) >>> 2);
 			rightCell.setSelectedIndex(editCell.cover & 0x03);
 			contentCell.setSelectedIndex(editCell.contents);
-			if(!sidebar.isAncestorOf(top)){
-				GridBagConstraints c = new GridBagConstraints();
-				c.weightx = 1;
-				c.weighty = .2;
-				c.gridy = 4;
-				sidebar.add(top,c);
-				c.gridx = 1;
-				sidebar.add(topCell,c);
-				c.gridy= 5;
-				sidebar.add(bottomCell,c);
-				c.gridx = 0;
-				sidebar.add(bottom,c);
-				c.gridy = 6;
-				sidebar.add(left,c);
-				c.gridx = 1;
-				sidebar.add(leftCell,c);
-				c.gridy= 7;
-				sidebar.add(rightCell,c);
-				c.gridx = 0;
-				sidebar.add(right,c);
-				c.gridy = 8;
-				sidebar.add(content, c);
-				c.gridx = 1;
-				sidebar.add(contentCell,c);
-				sidebar.revalidate();
-			}
 		}
 	}
 
