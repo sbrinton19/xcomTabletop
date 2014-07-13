@@ -34,11 +34,13 @@ public class MapGUI extends GUITemplate implements MouseListener {
 
 	private int rowCount = 20;
 	private int columnCount = 20;
+	private int elevationCount = 1;
+	
 	
 	private JPanel sidebar;
 	private ScrollPanel mapContainer;
 	private JScrollPane mapPane;
-	private ArrayList<ArrayList<MapCell>> mapGraphics;
+	private ArrayList<ArrayList<ArrayList<MapCell>>> mapGraphics;
 	private JButton addRow;
 	private JButton removeRow;
 	private JButton addColumn;
@@ -56,7 +58,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 	private JComboBox<String> contentCell;
 	
 	private MapCell editCell;
-	
+	private int currentElevation = 0;
 	
 	public MapGUI(){
 		//Setup GUI defaults
@@ -118,15 +120,18 @@ public class MapGUI extends GUITemplate implements MouseListener {
 		
 		//MAPVIEW
 		mapContainer = new ScrollPanel(new GridLayout(rowCount, columnCount));
-		mapGraphics = new ArrayList<ArrayList<MapCell>>();
+		mapGraphics = new ArrayList<ArrayList<ArrayList<MapCell>>>();
 		for(int i = 0; i < rowCount; i++){
-			ArrayList<MapCell> temp = new ArrayList<MapCell>(); 
-			
+			ArrayList<ArrayList<MapCell>> temp = new ArrayList<ArrayList<MapCell>>(); 
 			for(int j = 0; j < columnCount; j++){
-				MapCell adder = new MapCell(0,0);
-				adder.addMouseListener(this);
-				temp.add(adder);
-				mapContainer.add(adder);
+				ArrayList<MapCell> temp2 = new ArrayList<MapCell>();
+				for(int k = 0; k < elevationCount; k++){
+					MapCell adder = new MapCell(0,0);
+					adder.addMouseListener(this);
+					temp2.add(adder);
+					mapContainer.add(adder);
+				}
+				temp.add(temp2);
 			}
 			mapGraphics.add(temp);
 		}
@@ -186,12 +191,17 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			//Adding a row requires that the GridLayout be extended and the graphics and references are updated
 			GridLayout mapLayout = (GridLayout) mapContainer.getLayout();
 			mapLayout.setRows(mapLayout.getRows()+1);
-			ArrayList<MapCell> temp = new ArrayList<MapCell>(); 
+			ArrayList<ArrayList<MapCell>> temp = new ArrayList<ArrayList<MapCell>>(); 
 			for(int j = 0; j < columnCount; j++){
-				MapCell adder = new MapCell(0,0);
-				adder.addMouseListener(this);
-				temp.add(adder);
-				mapContainer.add(adder);
+				ArrayList<MapCell> temp2 = new ArrayList<MapCell>();
+				for(int k = 0; k < elevationCount; k++){
+					MapCell adder = new MapCell(0,0);
+					adder.addMouseListener(this);
+					temp2.add(adder);
+					if(k == currentElevation)
+						mapContainer.add(adder);
+				}
+				temp.add(temp2);
 			}
 			mapGraphics.add(temp);
 			mapContainer.revalidate();
@@ -206,7 +216,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			mapLayout.setRows(mapLayout.getRows()-1);
 			rowCount--;
 			for(int i = 0; i < mapGraphics.get(rowCount).size(); i++)
-				mapContainer.remove(mapGraphics.get(rowCount).get(i));
+				mapContainer.remove(mapGraphics.get(rowCount).get(i).get(currentElevation));
 			mapGraphics.remove(rowCount);
 			
 			mapContainer.revalidate();
@@ -216,11 +226,18 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			GridLayout mapLayout = (GridLayout) mapContainer.getLayout();
 			mapLayout.setColumns(mapLayout.getColumns()+1);
 			for(int i = 0; i < mapGraphics.size();i++){
-				MapCell adder = new MapCell(0,0);
-				adder.addMouseListener(this);
-				mapGraphics.get(i).add(adder);
+				ArrayList<MapCell> columnAdder = new ArrayList<MapCell>();
+				for(int j = 0; j< elevationCount; j++){
+					MapCell adder = new MapCell(0,0);
+					adder.addMouseListener(this);
+					columnAdder.add(adder);
+					if(j == currentElevation)
+						mapContainer.add(adder,columnCount*(i+1)+i);
+				}
+				
+				mapGraphics.get(i).add(columnAdder);
 				//Every added cell must be at the end of the row, this bumps up the subsequent insertion by 1
-				mapContainer.add(adder,columnCount*(i+1)+i);
+				
 			}
 			mapContainer.revalidate();
 			columnCount++;
@@ -234,7 +251,7 @@ public class MapGUI extends GUITemplate implements MouseListener {
 			mapLayout.setColumns(mapLayout.getColumns()-1);
 			columnCount--;
 			for(int i = 0; i < rowCount; i++){
-				mapContainer.remove(mapGraphics.get(i).get(columnCount));
+				mapContainer.remove(mapGraphics.get(i).get(columnCount).get(currentElevation));
 				mapGraphics.get(i).remove(columnCount);
 			}
 			mapContainer.revalidate();
