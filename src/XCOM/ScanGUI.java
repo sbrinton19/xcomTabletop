@@ -23,8 +23,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 /**
- * @author Stefan ScanGUI is the UI housing the scanning actions
+ * ScanGUI is the UI housing the scanning actions
  * and the home GUI for the application
+ * @author Stefan
  */
 public class ScanGUI extends GUITemplate implements MouseListener {
 

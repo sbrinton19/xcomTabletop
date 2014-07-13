@@ -1,11 +1,12 @@
 package XCOM;
 
 /**
- * @author Stefan
  * Core serves as the implementation class
  * The class initializes the ScanGUI to start the application and implements
  * all top-level functions as static methods
  * Tabletop X-COM Assistance Tool
+ * @author Stefan
+ * 
  */
 public class Core {
 	

@@ -21,9 +21,10 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 /**
- * @author Stefan
  * Serves as a general template of GUIs throughout the project
  * Mostly to save time on declaring the menubar
+ * @author Stefan
+ * 
  */
 public abstract class GUITemplate extends JFrame implements ActionListener {
 	
