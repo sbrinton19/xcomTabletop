@@ -207,7 +207,7 @@ public abstract class GUITemplate extends JFrame implements ActionListener {
 			saveDialog();
 		}
 		else if(arg0.getSource() == playerAdmin){
-			
+			Core.makePlayer();
 		}
 		else if (arg0.getSource() == xcomAdmin){
 			

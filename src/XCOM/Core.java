@@ -54,4 +54,14 @@ public class Core {
 		guis.add(new ScanGUI());
 	}
 	
+	public static void makePlayer(){
+		for(GUITemplate temp: guis ){
+			if(temp instanceof PlayerGUI){
+				temp.toFront();
+				return;
+			}
+		}
+		guis.add(new PlayerGUI());
+	}
+	
 }

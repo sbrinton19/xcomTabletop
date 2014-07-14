@@ -1,6 +1,7 @@
 package XCOM;
 
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 
@@ -23,6 +24,10 @@ public class ScrollPanel extends JPanel implements Scrollable{
 	
 	public ScrollPanel(GridLayout gridLayout) {
 		super(gridLayout);
+	}
+
+	public ScrollPanel(GridBagLayout gridBagLayout) {
+		super(gridBagLayout);
 	}
 
 	@Override
