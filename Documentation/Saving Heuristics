@@ -22,3 +22,24 @@ Saving Heuristics Documentation
 		then 1,1,0
 		then 1,1,1
 		Each tile is {1 byte for cover, 1 byte for contents}
+
+.xplay:
+	Number of humans: int
+	Humans' Data:
+		nameLength: int
+		name: String
+		ownerLength: int
+		owner: String
+		xp: int
+		aim: int
+		will: int
+		health: byte
+		movement: byte
+		class: byte
+		nationality: byte
+		abilities: byteArray[16]
+		medals: byteArray[5]
+		mec: boolean
+		gene: boolean
+		psi: boolean
+		sex: boolean
